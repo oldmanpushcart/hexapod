@@ -1,8 +1,9 @@
 package io.github.oldmanpushcart.hexapod.api;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 姿势
@@ -38,15 +39,20 @@ public class Posture {
         return duration;
     }
 
-    public Map<Joint, Double> map() {
-        final Map<Joint, Double> map = new HashMap<>();
-        for (final Joint joint : Joint.values()) {
-            final Double radian = getRadian(joint);
-            if (null != radian) {
-                map.put(joint, radian);
-            }
-        }
-        return Collections.unmodifiableMap(map);
+    public Iterator<Map.Entry<Joint, Double>> iterator() {
+        final Map<Joint, Double> map = new LinkedHashMap<>();
+        forEach(map::put);
+        return Collections.unmodifiableMap(map).entrySet().iterator();
+    }
+
+    public void forEach(BiConsumer<Joint, Double> consumer) {
+        Stream.of(Joint.values())
+                .forEach(joint -> {
+                    final Double radian = getRadian(joint);
+                    if (null != radian) {
+                        consumer.accept(joint, radian);
+                    }
+                });
     }
 
     public Double getRadian(Joint joint) {
@@ -72,7 +78,7 @@ public class Posture {
         };
     }
 
-    public Posture map(Joint joint, Double radian) {
+    public Posture put(Joint joint, Double radian) {
         switch (joint) {
             case L_F_H -> lfh = radian;
             case L_F_K -> lfk = radian;
@@ -96,9 +102,9 @@ public class Posture {
         return this;
     }
 
-    public Posture map(Joint[] joints, Double radian) {
-        for(final Joint joint: joints) {
-            map(joint, radian);
+    public Posture put(Joint[] joints, Double radian) {
+        for (final Joint joint : joints) {
+            put(joint, radian);
         }
         return this;
     }

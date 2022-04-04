@@ -2,21 +2,18 @@ package io.github.oldmanpushcart.hexapod.thing.manager.impl;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.github.oldmanpushcart.hexapod.thing.manager.PostureMgr;
-import io.github.oldmanpushcart.jpromisor.ListenableFuture;
-import io.github.oldmanpushcart.jpromisor.Promise;
-import io.github.oldmanpushcart.jpromisor.Promisor;
 import io.github.oldmanpushcart.hexapod.api.Joint;
 import io.github.oldmanpushcart.hexapod.api.Posture;
 import io.github.oldmanpushcart.hexapod.thing.manager.InfoMgr;
+import io.github.oldmanpushcart.hexapod.thing.manager.PostureMgr;
 import io.github.oldmanpushcart.hexapod.thing.manager.ServoMgr;
+import io.github.oldmanpushcart.jpromisor.ListenableFuture;
+import io.github.oldmanpushcart.jpromisor.Promise;
+import io.github.oldmanpushcart.jpromisor.Promisor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -24,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static io.github.oldmanpushcart.hexapod.api.math.RaPwMath.raToPw;
+import static io.github.oldmanpushcart.hexapod.thing.manager.impl.ServoCodec.radianToPw;
 
 @Singleton
 public class DefaultPostureMgr implements PostureMgr, Runnable {
@@ -144,11 +141,10 @@ public class DefaultPostureMgr implements PostureMgr, Runnable {
         return mapping.get(joint);
     }
 
-    private static ServoMgr.Position[] toPositions(Posture posture) {
-        return posture.map().entrySet().stream()
-                .map(entry -> new ServoMgr.Position(indexOf(entry.getKey()), raToPw(entry.getValue())))
-                .toList()
-                .toArray(new ServoMgr.Position[0]);
+    private static Set<ServoMgr.Position> toPositions(Posture posture) {
+        final Set<ServoMgr.Position> positions = new LinkedHashSet<>();
+        posture.forEach((joint, radian) -> positions.add(new ServoMgr.Position(indexOf(joint), radianToPw(radian))));
+        return Collections.unmodifiableSet(positions);
     }
 
     @Override
@@ -166,7 +162,14 @@ public class DefaultPostureMgr implements PostureMgr, Runnable {
                         servoMgr.rotate(posture.getDuration(), toPositions(posture));
                         lock.lockInterruptibly();
                         try {
-                            if (waiter.await(posture.getDuration(), TimeUnit.MILLISECONDS)) {
+
+                            /*
+                             * 计算等待时间，因为（串口通讯+机械设备运动）整体会让实际执行时间大于系统等待时间
+                             * 所以这里必须进行修正以抹平，修正的方式采用固定指的方式
+                             */
+                            long timeoutMs = posture.getDuration() + 50;
+
+                            if (waiter.await(timeoutMs, TimeUnit.MILLISECONDS)) {
                                 isCanceled = true;
                                 break;
                             }

@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 import static io.github.oldmanpushcart.hexapod.thing.manager.impl.ServoCodec.computeFrameDataLength;
 import static io.github.oldmanpushcart.hexapod.thing.manager.impl.ServoCodec.computeFrameLength;
@@ -31,7 +33,7 @@ public class DefaultServoMgr implements ServoMgr, ServoCodec {
     }
 
     @Override
-    public void rotate(long duration, Position[] positions) throws IOException {
+    public void rotate(long duration, Set<Position> positions) throws IOException {
         synchronized (buffer) {
             buffer.clear();
             encodeByteBuffer(buffer, duration, positions);
@@ -41,25 +43,25 @@ public class DefaultServoMgr implements ServoMgr, ServoCodec {
             }
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("{}/servo/rotate positions: {}", infoMgr.getName(), Arrays.asList(positions));
+            logger.debug("{}/servo/rotate positions: {}", infoMgr.getName(), positions);
         }
     }
 
     /**
      * 编码舵机旋转指令
      *
-     * @param buffer   数据缓冲
-     * @param duration 旋转时长
-     * @param positions   舵机位置
+     * @param buffer    数据缓冲
+     * @param duration  旋转时长
+     * @param positions 舵机位置
      */
-    private static void encodeByteBuffer(ByteBuffer buffer, long duration, Position[] positions) {
+    private static void encodeByteBuffer(ByteBuffer buffer, long duration, Set<Position> positions) {
         buffer
                 .put(MAGIC_CODE)
-                .put((byte) computeFrameDataLength(positions.length))
+                .put((byte) computeFrameDataLength(positions.size()))
                 .put(CMD_SERVO_MOVE)
-                .put((byte) positions.length)
+                .put((byte) positions.size())
                 .putShort((short) duration);
-        Arrays.stream(positions).forEach(position -> buffer.put((byte) position.index()).putShort((short) position.pw()));
+        positions.forEach(position -> buffer.put((byte) position.index()).putShort((short) position.pw()));
     }
 
 }
