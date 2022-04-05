@@ -5,34 +5,8 @@ package com.github.oldmanpushcart.hexapod.platform.gait;
  */
 public enum Limb {
 
-    /**
-     * 左前肢
-     */
-    L_F,
-
-    /**
-     * 左中肢
-     */
-    L_M,
-
-    /**
-     * 左后肢
-     */
-    L_H,
-
-    /**
-     * 右前肢
-     */
-    R_F,
-
-    /**
-     * 右中肢
-     */
-    R_M,
-
-    /**
-     * 右后肢
-     */
-    R_H
+    L_F, /*--左前--|+|--右前--*/ R_F,
+    L_M, /*--左中--|+|--右中--*/ R_M,
+    L_H, /*--左后--|+|--右后--*/ R_H
 
 }

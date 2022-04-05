@@ -19,7 +19,6 @@ public class Gait implements Iterable<Gait> {
     private final Gait parent;
     private final Posture posture;
 
-
     private Gait(Gait parent, Posture posture) {
         this.parent = parent;
         this.posture = posture;
@@ -48,6 +47,27 @@ public class Gait implements Iterable<Gait> {
     }
 
     /**
+     * 创建步态
+     *
+     * @param duration 步态时长
+     * @param fns      肢体映射
+     * @return 步态
+     */
+    public static Gait create(long duration, LimbFn.Mapping... fns) {
+        return new Gait(null, duration).limb(fns);
+    }
+
+    /**
+     * 创建步态
+     *
+     * @param duration 步态时长
+     * @return 步态
+     */
+    public static Gait create(long duration) {
+        return create(duration, new LimbFn.Mapping[0]);
+    }
+
+    /**
      * 下一个步态
      *
      * @param duration 步态时长
@@ -63,7 +83,7 @@ public class Gait implements Iterable<Gait> {
      * @return 下一个步态
      */
     public Gait next(LimbFn.Mapping... fns) {
-        return new Gait(this, posture.getDuration()).limb(fns);
+        return next(posture.getDuration(), fns);
     }
 
     /**
@@ -151,16 +171,6 @@ public class Gait implements Iterable<Gait> {
 
 
     /**
-     * 创建步态
-     *
-     * @param duration 步态时长
-     * @return 步态
-     */
-    public static Gait create(long duration) {
-        return new Gait(null, duration);
-    }
-
-    /**
      * 步态：站立
      *
      * @param duration 步态时长
@@ -226,15 +236,15 @@ public class Gait implements Iterable<Gait> {
      * @return 步态
      */
     public static Gait turnRight(long duration, int step) {
+        final Limb[] S1 = {L_F, R_M, L_H};
+        final Limb[] S2 = {R_F, L_M, R_H};
         Gait right = Gait.create(duration);
         for (int index = 0; index < step; index++) {
             right = right
-                    .next(up(R_F, L_M, R_H), forward(R_F, R_H), backward(L_M))
-                    .next(forward(L_F, L_H), backward(R_M))
-                    .next(down(R_F, L_M, R_H))
-                    .next(up(L_F, R_M, L_H), backward(L_F, L_H), forward(R_M))
-                    .next(backward(R_F, R_H), forward(L_M))
-                    .next(down(L_F, R_M, L_H));
+                    .next(down(S1), homing(S1), up(S2), forward(R_F, R_H), backward(L_M))
+                    .next(down(S1), homing(S1), down(S2))
+                    .next(up(S1), homing(S1), down(S2), homing(S2))
+                    .next(down(S1), homing(S1), down(S2), homing(S2));
         }
         return right;
     }
@@ -247,15 +257,15 @@ public class Gait implements Iterable<Gait> {
      * @return 步态
      */
     public static Gait turnLeft(long duration, int step) {
+        final Limb[] S1 = {L_F, R_M, L_H};
+        final Limb[] S2 = {R_F, L_M, R_H};
         Gait left = Gait.create(duration);
         for (int index = 0; index < step; index++) {
             left = left
-                    .next(up(L_F, R_M, L_H), forward(L_F, L_H), backward(R_M))
-                    .next(forward(R_F, R_H), backward(L_M))
-                    .next(down(L_F, R_M, L_H))
-                    .next(up(R_F, L_M, R_H), backward(R_F, R_H), forward(L_M))
-                    .next(backward(L_F, L_H), forward(R_M))
-                    .next(down(R_F, L_M, R_H));
+                    .next(down(S2), homing(S2), up(S1), forward(L_F, L_H), backward(R_M))
+                    .next(down(S2), homing(S2), down(S1))
+                    .next(up(S2), homing(S2), down(S1), homing(S1))
+                    .next(down(S2), homing(S2), down(S1), homing(S1));
         }
         return left;
     }

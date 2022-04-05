@@ -1,8 +1,6 @@
 package io.github.oldmanpushcart.hexapod.api;
 
-import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -31,20 +29,29 @@ public class Posture {
     private Double rhk;
     private Double rha;
 
+    /**
+     * 构建姿势
+     *
+     * @param duration 姿势时长
+     */
     public Posture(long duration) {
         this.duration = duration;
     }
 
+    /**
+     * 获取姿势时长
+     *
+     * @return 姿势时长
+     */
     public long getDuration() {
         return duration;
     }
 
-    public Iterator<Map.Entry<Joint, Double>> iterator() {
-        final Map<Joint, Double> map = new LinkedHashMap<>();
-        forEach(map::put);
-        return Collections.unmodifiableMap(map).entrySet().iterator();
-    }
-
+    /**
+     * 遍历关节弧度
+     *
+     * @param consumer 遍历函数
+     */
     public void forEach(BiConsumer<Joint, Double> consumer) {
         Stream.of(Joint.values())
                 .forEach(joint -> {
@@ -55,6 +62,12 @@ public class Posture {
                 });
     }
 
+    /**
+     * 获取关节弧度
+     *
+     * @param joint 关节
+     * @return 弧度
+     */
     public Double getRadian(Joint joint) {
         return switch (joint) {
             case L_F_H -> lfh;
@@ -78,7 +91,13 @@ public class Posture {
         };
     }
 
-    public Posture put(Joint joint, Double radian) {
+    /**
+     * 设置关节弧度
+     *
+     * @param joint  关节
+     * @param radian 弧度
+     */
+    public void put(Joint joint, Double radian) {
         switch (joint) {
             case L_F_H -> lfh = radian;
             case L_F_K -> lfk = radian;
@@ -99,14 +118,18 @@ public class Posture {
             case R_H_K -> rhk = radian;
             case R_H_A -> rha = radian;
         }
-        return this;
     }
 
-    public Posture put(Joint[] joints, Double radian) {
+    /**
+     * 设置关节组弧度
+     *
+     * @param joints 关节组
+     * @param radian 弧度
+     */
+    public void put(Joint[] joints, Double radian) {
         for (final Joint joint : joints) {
             put(joint, radian);
         }
-        return this;
     }
 
 }

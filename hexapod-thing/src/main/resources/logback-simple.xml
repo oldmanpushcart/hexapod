@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration scan="true" scanPeriod="60 seconds">
+
+    <appender name="LOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %5level %msg%n</pattern>　　
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/hexapod.log.%d</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- default -->
+    <root level="INFO">
+        <appender-ref ref="LOGFILE"/>
+    </root>
+
+    <!-- athing framework -->
+    <logger name="io.github.athingx.athing" level="INFO" additivity="false">
+        <appender-ref ref="LOGFILE"/>
+    </logger>
+
+    <!-- hexapod -->
+    <logger name="io.github.oldmanpushcart.hexapod" level="DEBUG" additivity="false">
+        <appender-ref ref="LOGFILE"/>
+    </logger>
+
+</configuration>

@@ -7,6 +7,7 @@ module io.github.oldmanpushcart.hexpod.thing {
     requires com.google.guice;
     requires jopt.simple;
     requires org.apache.commons.lang3;
+    requires logback.classic;
 
     uses io.github.athingx.athing.standard.thing.boot.ThingBoot;
     opens io.github.oldmanpushcart.hexapod.thing.manager.impl to io.github.athingx.athing.aliyun.thing;

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.function.Supplier;
 
 import static com.github.oldmanpushcart.hexapod.platform.gait.fn.JointFn.Filter.*;
+import static com.github.oldmanpushcart.hexapod.platform.util.HexMath.PI;
 import static com.github.oldmanpushcart.hexapod.platform.util.HexMath.fraction;
 import static java.lang.Math.PI;
 
@@ -37,12 +38,12 @@ public class LimbFn {
                         .filter(inLimbs(limbs))
                         .filter(isKnee)
                         .selected()
-                        .forEach(joint -> put(joint, fraction(PI, 8, 20)));
+                        .forEach(joint -> put(joint, PI(8, 20)));
                 Selector.select()
                         .filter(inLimbs(limbs))
                         .filter(isAnk)
                         .selected()
-                        .forEach(joint -> put(joint, fraction(PI, 5, 20)));
+                        .forEach(joint -> put(joint, PI(5, 20)));
             }};
         }
 
@@ -58,12 +59,12 @@ public class LimbFn {
                         .filter(inLimbs(limbs))
                         .filter(isKnee)
                         .selected()
-                        .forEach(joint -> put(joint, fraction(PI, 10, 20)));
+                        .forEach(joint -> put(joint, PI(10, 20)));
                 Selector.select()
                         .filter(inLimbs(limbs))
                         .filter(isAnk)
                         .selected()
-                        .forEach(joint -> put(joint, fraction(PI, 5, 20)));
+                        .forEach(joint -> put(joint, PI(5, 20)));
             }};
         }
 
@@ -79,7 +80,7 @@ public class LimbFn {
                         .filter(inLimbs(limbs))
                         .filter(isHip)
                         .selected()
-                        .forEach(joint -> put(joint, fraction(PI, 8, 20)));
+                        .forEach(joint -> put(joint, PI(8, 20)));
             }};
         }
 
@@ -95,7 +96,7 @@ public class LimbFn {
                         .filter(inLimbs(limbs))
                         .filter(isHip)
                         .selected()
-                        .forEach(joint -> put(joint, fraction(PI, 12, 20)));
+                        .forEach(joint -> put(joint, PI(12, 20)));
             }};
         }
 
@@ -111,7 +112,7 @@ public class LimbFn {
                         .filter(inLimbs(limbs))
                         .filter(isHip)
                         .selected()
-                        .forEach(joint -> put(joint, fraction(PI, 10, 20)));
+                        .forEach(joint -> put(joint, PI(10, 20)));
             }};
         }
 
